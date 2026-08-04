@@ -115,6 +115,43 @@ deployment/configuration change, security-model or permission change, and any
 significant user-flow change. When you finish such a change without touching
 docs, that is a defect — fix it before reporting the work done.
 
+## Changelog and release notes
+
+Two files record change history, with different jobs — keep both current:
+
+**`docs/CHANGELOG.md`** — the running log. Every significant merged change
+adds one line under `## Unreleased`, grouped by category
+(keep-a-changelog style):
+
+```md
+## Unreleased
+
+### Added
+- Cross-site job sharing rules
+
+### Changed
+- Publication approval flow now requires site-admin confirmation
+
+### Deprecated
+- Legacy /v1/jobs endpoint (use /v2/jobs; removal in v2.0.0)
+```
+
+Allowed categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`,
+`Security`. Write entries for the reader, not the diff: name the behavior
+that changed, not the files touched. A `Deprecated` entry names the
+replacement and, when known, the removal version.
+
+**`docs/21-releases/vX.Y.Z.md`** — one file per release, from
+`release-template.md`. At release time, move the `Unreleased` items into a
+new `## vX.Y.Z — <date>` heading in CHANGELOG.md, and write the release file
+with what the changelog line can't carry: breaking changes with migration
+paths, database migrations, configuration changes, a rollback plan, and
+known issues. `21-releases/unreleased.md` may hold in-progress notes for the
+next release.
+
+Adding the changelog line is part of finishing the change — not a separate
+task for later. If a merge is worth reviewing, it is worth a changelog line.
+
 ## Validating
 
 ```bash
