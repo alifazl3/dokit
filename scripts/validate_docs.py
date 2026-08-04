@@ -86,7 +86,9 @@ def main() -> int:
         if SECRET.search(text):
             errors.append(f"{rel}: possible secret committed to docs")
 
-        for target in LINK.findall(text):
+        # Links inside fenced code blocks are examples, not real references.
+        prose = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+        for target in LINK.findall(prose):
             if re.match(r"^[a-z]+://|^mailto:", target):
                 continue
             resolved = (path.parent / target).resolve()
