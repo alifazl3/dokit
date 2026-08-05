@@ -108,6 +108,7 @@ A feature or change is NOT complete until, where applicable:
 - runbook added/updated (any new operational procedure)
 - release note added to `21-releases/`
 - tests and scenarios updated
+- changelog entry written to `docs/changelog/{date}_{title}.md` (see below)
 
 Changes that ALWAYS require a doc update: new/changed API, new entity, new
 migration, new service, new event, architecture change, business-rule change,
@@ -151,6 +152,47 @@ next release.
 
 Adding the changelog line is part of finishing the change — not a separate
 task for later. If a merge is worth reviewing, it is worth a changelog line.
+
+## Per-change changelog entries (on by default)
+
+Beyond the one-line `CHANGELOG.md` entry, every finished change gets its own
+document in `docs/changelog/`, named `{date}_{title}.md` — date as
+`YYYY-MM-DD`, title in kebab-case:
+
+```text
+docs/changelog/2026-08-05_internal-api-proxy.md
+```
+
+Copy `templates/changelog-entry-template.md` and fill in:
+
+- **Summary** — what changed, in behavior terms (a few bullets)
+- **Files Changed** — every file touched, one per line
+- **Tests Run** — the exact commands run (or "Not run in this step" + why)
+- **Follow-ups / Risks** — what to verify, watch, or do next
+- **Purpose** *(optional)* — why the change was needed
+- **Prompt** *(optional)* — the user request that drove the change, verbatim
+
+This feature is ON by default: write the entry as part of finishing every
+change, in the same commit — exactly like the `CHANGELOG.md` line. Skip it
+only when the user explicitly asks you not to write changelog entries.
+
+As a safety net, register the bundled Stop hook — it blocks ending a session
+that changed files without writing an entry for today. In the project's
+`.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command",
+        "command": "bash .claude/skills/dokit/hooks/changelog-stop-hook.sh" } ] }
+    ]
+  }
+}
+```
+
+(Adjust the path if the skill is installed globally, e.g.
+`~/.claude/skills/dokit/hooks/changelog-stop-hook.sh`.)
 
 ## Validating
 

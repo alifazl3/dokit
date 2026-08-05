@@ -12,6 +12,8 @@ docs/
 ├── GLOSSARY.md          # one official definition per term
 ├── ROADMAP.md
 ├── CHANGELOG.md         # keep-a-changelog style (Unreleased/Added/Changed/Deprecated)
+├── changelog/           # one {date}_{title}.md per finished change
+│                        # (Summary, Files Changed, Tests Run, Follow-ups/Risks)
 │
 ├── 00-governance/       # §12 — documentation-standard, naming-conventions,
 │                        #        review-process, versioning, deprecation-policy,

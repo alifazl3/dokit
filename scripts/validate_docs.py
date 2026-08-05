@@ -25,6 +25,7 @@ SPECIAL = re.compile(
     r"|^ADR-\d{4}-[a-z0-9-]+\.md$"
     r"|^INC-\d{4}-\d{3}-[a-z0-9-]+\.md$"
     r"|^v\d+\.\d+\.\d+\.md$"
+    r"|^\d{4}-\d{2}-\d{2}_[a-z0-9-]+\.md$"
     r"|^unreleased\.md$"
     r"|^openapi\.(yaml|yml|json)$"
 )

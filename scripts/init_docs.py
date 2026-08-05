@@ -2,11 +2,13 @@
 """Scaffold a DocOS docs/ structure in a target project.
 
 Usage:
-    python init_docs.py <project-root> [--minimal] [--with-mobile] [--force]
+    python init_docs.py <project-root> [--minimal] [--with-mobile]
+                        [--no-changelog] [--force]
 
-Creates docs/ with the DocOS root files, numbered section folders, and a
-templates/ folder copied from this skill. Existing files are never overwritten
-unless --force is given.
+Creates docs/ with the DocOS root files, numbered section folders, a
+changelog/ folder for per-change entries (on by default, skip with
+--no-changelog), and a templates/ folder copied from this skill. Existing
+files are never overwritten unless --force is given.
 """
 import argparse
 import shutil
@@ -116,6 +118,17 @@ Before completing a change:
 """,
     "ROADMAP.md": """# Roadmap
 """,
+    "changelog/README.md": """# Changelog entries
+
+One document per finished change, named `{date}_{title}.md`:
+
+    2026-08-05_internal-api-proxy.md
+
+Copy `../templates/changelog-entry-template.md` and fill in Summary,
+Files Changed, Tests Run, and Follow-ups / Risks. This complements the
+one-line entry in `../CHANGELOG.md` — both are written when the change is
+finished, in the same commit.
+""",
     "CHANGELOG.md": """# Changelog
 
 ## Unreleased
@@ -140,6 +153,8 @@ def main() -> int:
                         help="lighter structure for small projects")
     parser.add_argument("--with-mobile", action="store_true",
                         help="include 12-mobile (skipped by default)")
+    parser.add_argument("--no-changelog", action="store_true",
+                        help="skip docs/changelog/ per-change entries folder")
     parser.add_argument("--force", action="store_true",
                         help="overwrite existing files")
     args = parser.parse_args()
@@ -153,6 +168,8 @@ def main() -> int:
     created = 0
 
     for name, content in ROOT_FILES.items():
+        if args.no_changelog and name.startswith("changelog/"):
+            continue
         if write(docs / name, content, args.force):
             created += 1
 

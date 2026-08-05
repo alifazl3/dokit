@@ -73,8 +73,18 @@ dokit/
 │   ├── standard-fa.md        # full DocOS standard (fa)
 │   └── structure.md          # folder map quick reference
 ├── templates/                # ADR, feature, entity, service, api, runbook,
-│                             # playbook, scenario, incident, release, architecture
+│                             # playbook, scenario, incident, release,
+│                             # architecture, changelog entry
+├── hooks/
+│   └── changelog-stop-hook.sh  # Stop hook: no change ends without its
+│                               # docs/changelog/{date}_{title}.md entry
 └── scripts/
     ├── init_docs.py          # scaffold docs/ in a project
     └── validate_docs.py      # lint the docs/ tree (CI-friendly)
 ```
+
+Per-change changelog entries are **on by default**: every finished change also
+writes `docs/changelog/{date}_{title}.md` (Summary, Files Changed, Tests Run,
+Follow-ups / Risks). Ask Claude to skip them if you don't want that, or leave
+the Stop hook unregistered — `SKILL.md` shows the one-block
+`.claude/settings.json` registration.
