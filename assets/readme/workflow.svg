@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="280" viewBox="0 0 1200 280"
+     role="img" aria-labelledby="title desc">
+  <title id="title">The dokit workflow</title>
+  <desc id="desc">Three stages: scaffold the docs tree with init_docs.py, write documents from the bundled templates, then validate the tree with validate_docs.py in CI.</desc>
+
+  <rect width="1200" height="280" rx="24" fill="#0f1318"/>
+
+  <g id="stage-scaffold" transform="translate(36 56)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+    <rect width="352" height="168" rx="14" fill="#151b22" stroke="#262e38"/>
+    <text x="20" y="36" font-size="20" fill="#e3aa4e">01 · SCAFFOLD</text>
+    <rect x="20" y="52" width="312" height="40" rx="8" fill="#0d1014" stroke="#262e38"/>
+    <text x="34" y="79" font-size="19" fill="#f2efe7">init_docs.py &lt;project&gt;</text>
+    <text x="20" y="126" font-size="18" fill="#97a0aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">creates docs/ — 25 numbered sections,</text>
+    <text x="20" y="150" font-size="18" fill="#97a0aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">root indexes and templates</text>
+  </g>
+
+  <path d="M 394 140 h 20 m 0 0 l -7 -6 m 7 6 l -7 6" stroke="#5c6672" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <g id="stage-write" transform="translate(424 56)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+    <rect width="352" height="168" rx="14" fill="#151b22" stroke="#262e38"/>
+    <text x="20" y="36" font-size="20" fill="#e3aa4e">02 · WRITE</text>
+    <rect x="20" y="52" width="312" height="40" rx="8" fill="#0d1014" stroke="#262e38"/>
+    <text x="34" y="79" font-size="19" fill="#f2efe7">templates/adr-template.md</text>
+    <text x="20" y="126" font-size="18" fill="#97a0aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">copy the matching template, fill it in —</text>
+    <text x="20" y="150" font-size="18" fill="#97a0aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">Claude picks it for you via /dokit</text>
+  </g>
+
+  <path d="M 782 140 h 20 m 0 0 l -7 -6 m 7 6 l -7 6" stroke="#5c6672" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <g id="stage-validate" transform="translate(812 56)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+    <rect width="352" height="168" rx="14" fill="#151b22" stroke="#262e38"/>
+    <text x="20" y="36" font-size="20" fill="#e3aa4e">03 · VALIDATE <tspan fill="#8fbf6f">✓</tspan></text>
+    <rect x="20" y="52" width="312" height="40" rx="8" fill="#0d1014" stroke="#262e38"/>
+    <text x="34" y="79" font-size="19" fill="#f2efe7">validate_docs.py &lt;project&gt;</text>
+    <text x="20" y="126" font-size="18" fill="#97a0aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">lints naming, front matter and links —</text>
+    <text x="20" y="150" font-size="18" fill="#97a0aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">exit 1 on errors · CI docs-lint job</text>
+  </g>
+</svg>
