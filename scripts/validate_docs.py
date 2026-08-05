@@ -68,6 +68,12 @@ def main() -> int:
     for path in sorted(docs.rglob("*")):
         rel = str(path.relative_to(docs.parent))
         name = path.name
+        # Directories starting with "_" hold vendored or generated assets
+        # (e.g. an exported design-system bundle) — not authored docs, so
+        # naming and content rules don't apply inside them.
+        parts = path.relative_to(docs).parts
+        if any(p.startswith("_") for p in parts[:-1]) or (path.is_dir() and name.startswith("_")):
+            continue
         if path.is_dir():
             if not KEBAB.match(name) and not re.match(r"^\d{2}-[a-z-]+$", name):
                 errors.append(f"{rel}: folder name is not kebab-case")
