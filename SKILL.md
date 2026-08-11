@@ -206,10 +206,11 @@ edit and in CI (`docs-lint` stage). Fix what it reports.
 
 ## Writing style
 
-- Write documentation content in the project's working language (this
-  standard's reference text is Persian; the docs themselves may be Persian,
-  English, or German as the project dictates) — but file names, front matter
-  keys, and statuses are always English.
+- **Write all documentation in English** — always, regardless of the
+  language the user speaks to you in (this standard's reference text being
+  Persian does not change this). Use another language, or bilingual
+  documents, only when the user explicitly requests it. File names, front
+  matter keys, and statuses are English in every case.
 - Explain *why*, not just *what* — especially in ADRs and business rules.
 - Link related docs liberally; an unlinked document is invisible.
 - Keep each document focused; if it covers two topics, split it.
