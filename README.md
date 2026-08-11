@@ -56,6 +56,11 @@ Then in any session: ask Claude to document something, or invoke `/dokit`.
 Claude scaffolds the tree, picks templates, enforces the Definition of Done,
 and keeps `CHANGELOG.md` current as part of finishing each change.
 
+After updating the skill (`git pull` in the skill directory), run
+`/dokit upgrade` in each project: it re-checks the whole `docs/` tree against
+the current version of the standard and fixes documents written under older
+versions — safe to run any time, it changes nothing on a conforming tree.
+
 ## Use the scripts directly (no Claude needed)
 
 ```bash

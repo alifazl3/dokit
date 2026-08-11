@@ -10,7 +10,10 @@ description: >-
   AI_INDEX for AI agents. Also use it when the user mentions "dokit" or
   "DocOS" by name, when scaffolding a new project that needs documentation,
   and when finishing a feature or change — DocOS defines the documentation
-  Definition of Done that every significant change must satisfy.
+  Definition of Done that every significant change must satisfy. When the
+  user runs "/dokit upgrade" or asks to re-check, migrate, or upgrade
+  existing docs after a skill/standard update, follow the "Upgrading
+  existing docs" workflow.
 ---
 
 # dokit — Documentation Operating System (DocOS)
@@ -203,6 +206,57 @@ python scripts/validate_docs.py <target-project-root>
 Checks required root files, naming conventions, ADR filename format, front
 matter status values, and broken relative links. Run it after any large docs
 edit and in CI (`docs-lint` stage). Fix what it reports.
+
+## Upgrading existing docs — `/dokit upgrade`
+
+Run this workflow whenever the user invokes `/dokit upgrade` (or asks to
+re-check, migrate, or bring existing docs up to the current standard —
+typically right after updating this skill). Docs written under an older
+version of the standard are brought into conformance with the rules as they
+stand NOW. The workflow is idempotent: on a fully conforming tree it ends
+with "nothing to fix", so it is always safe to run.
+
+1. **Re-read the current rules first.** This SKILL.md — every section — is
+   the authority, together with [references/structure.md](references/structure.md).
+   Never fix from memory; the whole point is that the rules may have changed
+   since the docs were written.
+2. **Run the validator** and keep its report as the initial defect list:
+
+   ```bash
+   python scripts/validate_docs.py <target-project-root>
+   ```
+
+3. **Sweep every file under `docs/`** and check it against the current
+   rules — the validator does not catch everything:
+   - required root files exist (`README.md`, `INDEX.md`, `AI_INDEX.md`,
+     `OWNERS.md`, `GLOSSARY.md`, `ROADMAP.md`, `CHANGELOG.md`)
+   - naming: English, lowercase `kebab-case`; ADR / incident / release
+     filename patterns; no `notes.md` or `final-v2.md` leftovers
+   - front matter: present on every important document, only allowed
+     `status` values, an `owner` set
+   - placement: each document lives in the correct numbered section
+     (consult `structure.md`); move misplaced files
+   - single source of truth: duplicated content is replaced with a link to
+     the owning document
+   - language: documentation is in English — translate docs written in
+     another language, unless the user explicitly chose that language or a
+     bilingual setup for this project
+   - changelog: `docs/CHANGELOG.md` follows keep-a-changelog categories;
+     per-change entries in `docs/changelog/` use `{date}_{title}.md`
+   - deprecation: removed/obsolete docs carry `status: deprecated` and
+     `deprecated_by` instead of being deleted
+   - `INDEX.md` / `AI_INDEX.md` list every document they should
+4. **Fix mechanical issues directly**: renames, moves, front matter,
+   category fixes, link updates, index entries. Every rename or move must
+   update all inbound links in the same pass. For judgment calls — merging
+   duplicated topics, translating a large document, anything destructive —
+   list them and confirm with the user before acting.
+5. **Re-run the validator** and repeat until it exits clean.
+6. **Record the upgrade** like any other change: a `Changed` line in
+   `docs/CHANGELOG.md` and a `docs/changelog/{date}_docs-standard-upgrade.md`
+   entry listing every file that was fixed.
+7. **Report**: what was fixed, what was already conforming, and what was
+   deliberately left for the user to decide.
 
 ## Writing style
 
