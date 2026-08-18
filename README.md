@@ -93,3 +93,9 @@ writes `docs/changelog/{date}_{title}.md` (Summary, Files Changed, Tests Run,
 Follow-ups / Risks). Ask Claude to skip them if you don't want that, or leave
 the Stop hook unregistered — `SKILL.md` shows the one-block
 `.claude/settings.json` registration.
+
+---
+
+With special thanks to [@shakouri10](https://github.com/shakouri10), who came
+up with the idea for this documentation system — after a few attempts
+together, it grew into this skill.
