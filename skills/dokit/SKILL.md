@@ -1,0 +1,273 @@
+---
+name: dokit
+description: >-
+  Apply DocOS — a comprehensive documentation operating system for software
+  projects. Use this skill whenever the user asks to create, structure,
+  update, review, or validate project documentation of any kind: setting up a
+  docs/ folder, writing an ADR (architecture decision record), documenting a
+  feature, entity, service, API, database table, or event, writing runbooks,
+  playbooks, scenarios, release notes, glossaries, onboarding docs, or an
+  AI_INDEX for AI agents. Also use it when the user mentions "dokit" or
+  "DocOS" by name, when scaffolding a new project that needs documentation,
+  and when finishing a feature or change — DocOS defines the documentation
+  Definition of Done that every significant change must satisfy. When the
+  user runs "/dokit upgrade" or asks to re-check, migrate, or upgrade
+  existing docs after a skill/standard update, follow the "Upgrading
+  existing docs" workflow.
+---
+
+# dokit — Documentation Operating System (DocOS)
+
+DocOS treats documentation as part of the product: it lives next to the code,
+is reviewed like code, has a single source of truth per topic, an owner per
+document, and is usable by both humans and AI agents. The full normative
+standard (in Persian) is in [references/standard-fa.md](references/standard-fa.md) —
+read the relevant section when you need details beyond this file.
+
+## Core rules (always apply)
+
+1. **Single source of truth.** API contract lives in `docs/06-api/openapi.yaml`,
+   architecture decisions in ADRs, domain shape in `04-domain/`, deployment in
+   runbooks, feature behavior in `20-features/`. Never duplicate the same
+   information into a second file — link to it.
+2. **Every document has an owner** (in front matter and `OWNERS.md`).
+3. **Docs change with the code, in the same merge request** — never "later".
+4. **Naming:** English, lowercase, `kebab-case`, short and descriptive.
+   ADRs: `ADR-0001-use-postgresql.md`. Releases: `v1.2.0.md`.
+   Incidents: `INC-2026-001-database-outage.md`. Never `notes.md`, `final-v2.md`.
+5. **No secrets in docs.** Reference the secret store, never the value.
+6. **Deprecate, don't delete.** Old docs get `status: deprecated` +
+   `deprecated_by: <path>` before removal; decision history is never erased.
+
+## Initializing docs in a project
+
+Run the bundled scaffolder instead of creating folders by hand:
+
+```bash
+python scripts/init_docs.py <target-project-root>          # full structure
+python scripts/init_docs.py <target> --minimal             # small projects
+python scripts/init_docs.py <target> --with-mobile         # include 12-mobile
+```
+
+It creates `docs/` with root files (`README.md`, `INDEX.md`, `AI_INDEX.md`,
+`OWNERS.md`, `GLOSSARY.md`, `ROADMAP.md`, `CHANGELOG.md`), the numbered
+sections `00-governance` … `24-reference`, the `templates/` folder (copied
+from this skill), and a starter `README.md` in each section. After running it,
+fill in `AI_INDEX.md` and `01-product/vision.md` first — they anchor
+everything else.
+
+The full folder map and per-section file lists are in
+[references/structure.md](references/structure.md); consult it when deciding
+where a new document belongs.
+
+## Creating a document
+
+Copy the matching file from `templates/` and fill it in — do not invent your
+own layout:
+
+| Need | Template | Destination |
+|---|---|---|
+| Architecture decision | `adr-template.md` | `19-decisions/ADR-NNNN-<slug>.md` |
+| Feature | `feature-template.md` | `20-features/<slug>/README.md` (+ sibling files) |
+| Entity | `entity-template.md` | `04-domain/entities/<slug>.md` |
+| Service | `service-template.md` | `07-services/<slug>/README.md` |
+| API topic | `api-template.md` | `06-api/` |
+| Runbook (how to do an op) | `runbook-template.md` | `23-runbooks/<slug>.md` |
+| Playbook (incident response) | `playbook-template.md` | `18-playbooks/<slug>.md` |
+| Scenario (user flow) | `scenario-template.md` | `22-scenarios/<slug>.md` |
+| Release notes | `release-template.md` | `21-releases/vX.Y.Z.md` |
+| Incident report | `incident-template.md` | `INC-YYYY-NNN-<slug>.md` |
+| Architecture view | `architecture-template.md` | `05-architecture/` |
+
+ADR numbers are sequential — check the highest existing number first.
+ADR statuses: `Proposed`, `Accepted`, `Rejected`, `Deprecated`, `Superseded`.
+
+Every important document starts with YAML front matter:
+
+```yaml
+---
+title: Media Upload
+status: active        # draft | proposed | active | deprecated | archived | superseded
+owner: backend-team
+version: 1.0
+last_reviewed: 2026-08-04
+related_features: []
+related_adrs: []
+---
+```
+
+After adding a document, add it to `docs/INDEX.md` (and to `AI_INDEX.md` if an
+agent would need it).
+
+## Definition of Done (enforce on every significant change)
+
+A feature or change is NOT complete until, where applicable:
+
+- feature doc in `20-features/` created or updated
+- OpenAPI contract updated (any API change)
+- new/changed entities documented in `04-domain/`
+- migration documented in `08-database/`
+- ADR recorded (any architecture change)
+- runbook added/updated (any new operational procedure)
+- release note added to `21-releases/`
+- tests and scenarios updated
+- changelog entry written to `docs/changelog/{date}_{title}.md` (see below)
+
+Changes that ALWAYS require a doc update: new/changed API, new entity, new
+migration, new service, new event, architecture change, business-rule change,
+deployment/configuration change, security-model or permission change, and any
+significant user-flow change. When you finish such a change without touching
+docs, that is a defect — fix it before reporting the work done.
+
+## Changelog and release notes
+
+Two files record change history, with different jobs — keep both current:
+
+**`docs/CHANGELOG.md`** — the running log. Every significant merged change
+adds one line under `## Unreleased`, grouped by category
+(keep-a-changelog style):
+
+```md
+## Unreleased
+
+### Added
+- Cross-site job sharing rules
+
+### Changed
+- Publication approval flow now requires site-admin confirmation
+
+### Deprecated
+- Legacy /v1/jobs endpoint (use /v2/jobs; removal in v2.0.0)
+```
+
+Allowed categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`,
+`Security`. Write entries for the reader, not the diff: name the behavior
+that changed, not the files touched. A `Deprecated` entry names the
+replacement and, when known, the removal version.
+
+**`docs/21-releases/vX.Y.Z.md`** — one file per release, from
+`release-template.md`. At release time, move the `Unreleased` items into a
+new `## vX.Y.Z — <date>` heading in CHANGELOG.md, and write the release file
+with what the changelog line can't carry: breaking changes with migration
+paths, database migrations, configuration changes, a rollback plan, and
+known issues. `21-releases/unreleased.md` may hold in-progress notes for the
+next release.
+
+Adding the changelog line is part of finishing the change — not a separate
+task for later. If a merge is worth reviewing, it is worth a changelog line.
+
+## Per-change changelog entries (on by default)
+
+Beyond the one-line `CHANGELOG.md` entry, every finished change gets its own
+document in `docs/changelog/`, named `{date}_{title}.md` — date as
+`YYYY-MM-DD`, title in kebab-case:
+
+```text
+docs/changelog/2026-08-05_internal-api-proxy.md
+```
+
+Copy `templates/changelog-entry-template.md` and fill in:
+
+- **Summary** — what changed, in behavior terms (a few bullets)
+- **Files Changed** — every file touched, one per line
+- **Tests Run** — the exact commands run (or "Not run in this step" + why)
+- **Follow-ups / Risks** — what to verify, watch, or do next
+- **Purpose** *(optional)* — why the change was needed
+- **Prompt** *(optional)* — the user request that drove the change, verbatim
+
+This feature is ON by default: write the entry as part of finishing every
+change, in the same commit — exactly like the `CHANGELOG.md` line. Skip it
+only when the user explicitly asks you not to write changelog entries.
+
+As a safety net, the bundled Stop hook blocks ending a session that changed
+files without writing an entry for today. Installed as a plugin
+(`/plugin install dokit@dokit`), the hook registers automatically — nothing
+to configure. For a bare-skill install, register it in the project's
+`.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command",
+        "command": "bash ~/.claude/skills/dokit/hooks/changelog-stop-hook.sh" } ] }
+    ]
+  }
+}
+```
+
+(Adjust the path to wherever the skill directory lives, e.g.
+`.claude/skills/dokit/hooks/changelog-stop-hook.sh` for a per-project
+install.)
+
+## Validating
+
+```bash
+python scripts/validate_docs.py <target-project-root>
+```
+
+Checks required root files, naming conventions, ADR filename format, front
+matter status values, and broken relative links. Run it after any large docs
+edit and in CI (`docs-lint` stage). Fix what it reports.
+
+## Upgrading existing docs — `/dokit upgrade`
+
+Run this workflow whenever the user invokes `/dokit upgrade` (or asks to
+re-check, migrate, or bring existing docs up to the current standard —
+typically right after updating this skill). Docs written under an older
+version of the standard are brought into conformance with the rules as they
+stand NOW. The workflow is idempotent: on a fully conforming tree it ends
+with "nothing to fix", so it is always safe to run.
+
+1. **Re-read the current rules first.** This SKILL.md — every section — is
+   the authority, together with [references/structure.md](references/structure.md).
+   Never fix from memory; the whole point is that the rules may have changed
+   since the docs were written.
+2. **Run the validator** and keep its report as the initial defect list:
+
+   ```bash
+   python scripts/validate_docs.py <target-project-root>
+   ```
+
+3. **Sweep every file under `docs/`** and check it against the current
+   rules — the validator does not catch everything:
+   - required root files exist (`README.md`, `INDEX.md`, `AI_INDEX.md`,
+     `OWNERS.md`, `GLOSSARY.md`, `ROADMAP.md`, `CHANGELOG.md`)
+   - naming: English, lowercase `kebab-case`; ADR / incident / release
+     filename patterns; no `notes.md` or `final-v2.md` leftovers
+   - front matter: present on every important document, only allowed
+     `status` values, an `owner` set
+   - placement: each document lives in the correct numbered section
+     (consult `structure.md`); move misplaced files
+   - single source of truth: duplicated content is replaced with a link to
+     the owning document
+   - language: documentation is in English — translate docs written in
+     another language, unless the user explicitly chose that language or a
+     bilingual setup for this project
+   - changelog: `docs/CHANGELOG.md` follows keep-a-changelog categories;
+     per-change entries in `docs/changelog/` use `{date}_{title}.md`
+   - deprecation: removed/obsolete docs carry `status: deprecated` and
+     `deprecated_by` instead of being deleted
+   - `INDEX.md` / `AI_INDEX.md` list every document they should
+4. **Fix mechanical issues directly**: renames, moves, front matter,
+   category fixes, link updates, index entries. Every rename or move must
+   update all inbound links in the same pass. For judgment calls — merging
+   duplicated topics, translating a large document, anything destructive —
+   list them and confirm with the user before acting.
+5. **Re-run the validator** and repeat until it exits clean.
+6. **Record the upgrade** like any other change: a `Changed` line in
+   `docs/CHANGELOG.md` and a `docs/changelog/{date}_docs-standard-upgrade.md`
+   entry listing every file that was fixed.
+7. **Report**: what was fixed, what was already conforming, and what was
+   deliberately left for the user to decide.
+
+## Writing style
+
+- **Write all documentation in English** — always, regardless of the
+  language the user speaks to you in (this standard's reference text being
+  Persian does not change this). Use another language, or bilingual
+  documents, only when the user explicitly requests it. File names, front
+  matter keys, and statuses are English in every case.
+- Explain *why*, not just *what* — especially in ADRs and business rules.
+- Link related docs liberally; an unlinked document is invisible.
+- Keep each document focused; if it covers two topics, split it.

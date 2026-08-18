@@ -1,0 +1,17 @@
+{
+  "name": "dokit",
+  "owner": {
+    "name": "ali fazlollahi",
+    "url": "https://github.com/alifazl3"
+  },
+  "metadata": {
+    "description": "DocOS — a complete documentation standard for software projects, packaged as the dokit Claude Code plugin."
+  },
+  "plugins": [
+    {
+      "name": "dokit",
+      "source": "./",
+      "description": "DocOS — Documentation Operating System. A complete documentation standard for software projects: numbered docs/ taxonomy, a template for every document type, lifecycle rules, and a docs Definition of Done — with scaffold and lint scripts."
+    }
+  ]
+}

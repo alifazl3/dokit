@@ -22,8 +22,9 @@ everything else links. Every document carries front matter (owner, status,
 version, last review) and follows one naming convention.
 
 The full normative standard (Persian) is in
-[`references/standard-fa.md`](references/standard-fa.md);
-[`references/structure.md`](references/structure.md) is the quick folder map.
+[`references/standard-fa.md`](skills/dokit/references/standard-fa.md);
+[`references/structure.md`](skills/dokit/references/structure.md) is the
+quick folder map.
 
 ## How it works
 
@@ -34,7 +35,8 @@ The full normative standard (Persian) is in
 1. **Scaffold** — `init_docs.py` creates the full `docs/` tree with root
    indexes and a starter README in every section (`--minimal` for small
    projects, `--with-mobile` to include `12-mobile`).
-2. **Write** — copy the matching file from [`templates/`](templates/) and fill
+2. **Write** — copy the matching file from
+   [`templates/`](skills/dokit/templates/) and fill
    it in; with the skill installed, Claude picks the right template,
    destination, and front matter for you.
 3. **Validate** — `validate_docs.py` lints the tree: required files, naming
@@ -42,50 +44,65 @@ The full normative standard (Persian) is in
    It exits non-zero on errors, so it drops straight into CI as a `docs-lint`
    job.
 
-## Install as a Claude Code skill
+## Install
+
+**As a plugin (recommended)** — inside Claude Code:
+
+```
+/plugin marketplace add alifazl3/dokit
+/plugin install dokit@dokit
+```
+
+This also auto-registers the changelog Stop hook and gets you updates through
+`/plugin` — no manual `git pull`.
+
+**Or manually as a bare skill:**
 
 ```bash
-# per project
-git clone git@github.com:alifazl3/dokit.git .claude/skills/dokit
-
-# or globally
-git clone git@github.com:alifazl3/dokit.git ~/.claude/skills/dokit
+git clone https://github.com/alifazl3/dokit.git
+ln -s "$PWD/dokit/skills/dokit" ~/.claude/skills/dokit   # or .claude/skills/ per project
 ```
 
 Then in any session: ask Claude to document something, or invoke `/dokit`.
 Claude scaffolds the tree, picks templates, enforces the Definition of Done,
 and keeps `CHANGELOG.md` current as part of finishing each change.
 
-After updating the skill (`git pull` in the skill directory), run
-`/dokit upgrade` in each project: it re-checks the whole `docs/` tree against
-the current version of the standard and fixes documents written under older
-versions — safe to run any time, it changes nothing on a conforming tree.
+After updating the skill (via `/plugin` or `git pull`), run `/dokit upgrade`
+in each project: it re-checks the whole `docs/` tree against the current
+version of the standard and fixes documents written under older versions —
+safe to run any time, it changes nothing on a conforming tree.
 
 ## Use the scripts directly (no Claude needed)
 
 ```bash
-python scripts/init_docs.py /path/to/project            # full structure
-python scripts/init_docs.py /path/to/project --minimal  # small projects
-python scripts/validate_docs.py /path/to/project        # lint (exit 1 on errors)
+python skills/dokit/scripts/init_docs.py /path/to/project            # full structure
+python skills/dokit/scripts/init_docs.py /path/to/project --minimal  # small projects
+python skills/dokit/scripts/validate_docs.py /path/to/project        # lint (exit 1 on errors)
 ```
 
 ## What's inside
 
 ```
 dokit/
-├── SKILL.md                  # the skill: rules Claude applies + workflow
-├── references/
-│   ├── standard-fa.md        # full DocOS standard (fa)
-│   └── structure.md          # folder map quick reference
-├── templates/                # ADR, feature, entity, service, api, runbook,
-│                             # playbook, scenario, incident, release,
-│                             # architecture, changelog entry
+├── .claude-plugin/
+│   ├── plugin.json           # plugin manifest
+│   └── marketplace.json      # the repo is its own marketplace
 ├── hooks/
-│   └── changelog-stop-hook.sh  # Stop hook: no change ends without its
-│                               # docs/changelog/{date}_{title}.md entry
-└── scripts/
-    ├── init_docs.py          # scaffold docs/ in a project
-    └── validate_docs.py      # lint the docs/ tree (CI-friendly)
+│   └── hooks.json            # plugin installs auto-register the Stop hook
+└── skills/dokit/
+    ├── SKILL.md              # the skill: rules Claude applies + workflow
+    ├── references/
+    │   ├── standard-fa.md    # full DocOS standard (fa)
+    │   └── structure.md      # folder map quick reference
+    ├── templates/            # ADR, feature, entity, service, api, runbook,
+    │                         # playbook, scenario, incident, release,
+    │                         # architecture, changelog entry
+    ├── hooks/
+    │   └── changelog-stop-hook.sh  # Stop hook: no change ends without its
+    │                               # docs/changelog/{date}_{title}.md entry
+    └── scripts/
+        ├── init_docs.py      # scaffold docs/ in a project
+        └── validate_docs.py  # lint the docs/ tree (CI-friendly)
 ```
 
 Per-change changelog entries are **on by default**: every finished change also

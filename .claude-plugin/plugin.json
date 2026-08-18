@@ -1,0 +1,20 @@
+{
+  "name": "dokit",
+  "description": "DocOS — Documentation Operating System. A complete documentation standard for software projects: numbered docs/ taxonomy, a template for every document type, lifecycle rules, and a docs Definition of Done — with scaffold and lint scripts.",
+  "version": "1.0.0",
+  "author": {
+    "name": "ali fazlollahi",
+    "url": "https://github.com/alifazl3"
+  },
+  "homepage": "https://github.com/alifazl3/dokit",
+  "repository": "https://github.com/alifazl3/dokit",
+  "license": "MIT",
+  "keywords": [
+    "documentation",
+    "docs-as-code",
+    "adr",
+    "runbook",
+    "changelog",
+    "docos"
+  ]
+}
